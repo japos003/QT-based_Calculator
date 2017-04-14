@@ -20,3 +20,7 @@ inputed numbers
 ### 2017 March 23
 
 * Uploaded the project to the Github repository
+
+### 2017 April 14
+
+* Updated and changed parsing algorithm. The algorithm now consider PEMDAS.
