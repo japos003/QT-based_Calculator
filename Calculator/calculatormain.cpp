@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <QSignalMapper>
+#include <queue>
 #include <map>
 
 /*
@@ -151,29 +152,22 @@ void CalculatorMain::button_pressed(QString button_command){
         //Functions
         case 10:
             std::cout << "button add pressed" << std::endl;
-            number_storage.push(create_number(equation, ADD));
-            //equation += "+";
-            equation = "";
+            equation += "+";
             break;
         case 11:
-            std::cout << "button subtract pressed" << std::endl;
-            number_storage.push(create_number(equation, SUB));
-            equation = "";
+            equation += "-";
             break;
         case 12:
             std::cout << "button divide pressed" << std::endl;
-            number_storage.push(create_number(equation, DIV));
-            equation = "";
+            equation += "/";
             break;
         case 13:
             std::cout << "button multiply pressed" << std::endl;
-            number_storage.push(create_number(equation, MUL));
-            equation = "";
+            equation += "*";
             break;
         case 14:
             std::cout << "button modulo pressed" << std::endl;
-            number_storage.push(create_number(equation, MOD));
-            equation = "";
+            //number_storage.push(create_number(equation, MOD));
             break;
         case 15:
             std::cout << "button clear pressed" << std::endl;
@@ -181,50 +175,103 @@ void CalculatorMain::button_pressed(QString button_command){
             break;
         case 16:
             std::cout << "button enter pressed" << std::endl;
-            calculate(equation);
+            display_result = parse_mul_div(equation);
+            display_result = parse_add_sub(display_result);
+            ui->lcdNumber->display(atoi(display_result.c_str()));
             break;
     }
 
     std::cout << "equation: " << equation << std::endl;
-    ui->num_screen->setText(QString::fromStdString(equation));
+    ui->equation_display->setText(QString::fromStdString(equation));
+    //ui->num_screen->setText(QString::fromStdString(equation));
 }
-number_data CalculatorMain::create_number(std::string equation, math_op func){
-    number_data res;
-    res.num = equation;
-    res.operation = func;
+
+std::string CalculatorMain::parse(std::string equation, char operator1, char operator2) {
+    std::queue<int> int_queue;
+    std::queue<char> operation_queue;
+
+    std::string num = "";
+
+    std::string res = "";
+
+    for (int ch = 0; ch < equation.size(); ch++) {
+        std::cout << equation[ch] << std::endl;
+        if (equation[ch] == '*' || equation[ch] == '/' || equation[ch] == '+' || equation[ch] == '-') {
+
+            int_queue.push(atoi(num.c_str()));
+
+            if (equation[ch] == operator1 || equation[ch] == operator2) {
+                operation_queue.push(equation[ch]);
+            }
+
+            else {
+                if (!operation_queue.empty()) {
+                    res += std::to_string(calculate(int_queue, operation_queue));
+                    while (!operation_queue.empty())
+                        operation_queue.pop();
+                    while (!int_queue.empty())
+                        int_queue.pop();
+                }
+                else {
+                    res += std::to_string(int_queue.front());
+                    int_queue.pop();
+                }
+
+
+                res += equation[ch];
+            }
+
+            num.clear();
+        }
+        else {
+            num += equation[ch];
+            if (ch == equation.size() - 1)
+                int_queue.push(atoi(num.c_str()));
+        }
+
+        std::cout << res << std::endl;
+    }
+    if (int_queue.size() == 1 && operation_queue.empty())
+        res += std::to_string(int_queue.front());
+    else if (!int_queue.empty() && !operation_queue.empty())
+        res += std::to_string(calculate(int_queue, operation_queue));
 
     return res;
 }
 
-void CalculatorMain::calculate(std::string num){
-    if(number_storage.empty()){
-        std::cout << "storage is empty." << std::endl;
-        return;
+int CalculatorMain::calculate(std::queue<int> int_queue, std::queue<char> operation_queue) {
+
+    int res = int_queue.front();
+    int_queue.pop();
+
+    while (!int_queue.empty() || !operation_queue.empty()) {
+        if (operation_queue.front() == '*') {
+            res *= int_queue.front();
+        }
+        else if (operation_queue.front() == '/')
+            res /= int_queue.front();
+        else if (operation_queue.front() == '+')
+            res += int_queue.front();
+        else if (operation_queue.front() == '-')
+            res -= int_queue.front();
+
+        int_queue.pop();
+        operation_queue.pop();
     }
 
-    std::cout << number_storage.top().num << std::endl;
+    if (!operation_queue.empty())
+        operation_queue.pop();
 
-    int res = 0;
+    if (!int_queue.empty())
+        int_queue.pop();
+    return res;
+}
 
-    switch(number_storage.top().operation){
-        case ADD:
-            res = atoi(number_storage.top().num.c_str()) + atoi(num.c_str());
-            break;
-        case SUB:
-            res = atoi(number_storage.top().num.c_str()) - atoi(num.c_str());
-            break;
-        case MUL:
-            res = atoi(number_storage.top().num.c_str()) * atoi(num.c_str());
-            break;
-        case DIV:
-            res = atoi(number_storage.top().num.c_str()) / atoi(num.c_str());
-            break;
-        case MOD:
-            res = atoi(number_storage.top().num.c_str()) % atoi(num.c_str());
-            break;
-    }
-    number_storage.pop();
+std::string CalculatorMain::parse_mul_div(std::string equation) {
+    return parse(equation, '*', '/');
+}
 
-    equation = std::to_string(res);
+std::string CalculatorMain::parse_add_sub(std::string equation) {
 
+    return parse(equation, '+', '-');
 }

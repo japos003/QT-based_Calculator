@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLCDNumber>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
@@ -45,8 +46,9 @@ public:
     QPushButton *button_mul;
     QPushButton *button_mod;
     QPushButton *button_clear;
-    QLabel *num_screen;
     QPushButton *button_enter;
+    QLCDNumber *lcdNumber;
+    QLabel *equation_display;
     QMenuBar *menuBar;
     QMenu *menuCalculator;
     QToolBar *mainToolBar;
@@ -107,12 +109,21 @@ public:
         button_clear = new QPushButton(centralWidget);
         button_clear->setObjectName(QStringLiteral("button_clear"));
         button_clear->setGeometry(QRect(130, 210, 51, 23));
-        num_screen = new QLabel(centralWidget);
-        num_screen->setObjectName(QStringLiteral("num_screen"));
-        num_screen->setGeometry(QRect(136, 30, 101, 20));
         button_enter = new QPushButton(centralWidget);
         button_enter->setObjectName(QStringLiteral("button_enter"));
         button_enter->setGeometry(QRect(190, 210, 51, 23));
+        lcdNumber = new QLCDNumber(centralWidget);
+        lcdNumber->setObjectName(QStringLiteral("lcdNumber"));
+        lcdNumber->setGeometry(QRect(130, 30, 111, 23));
+        QFont font;
+        font.setBold(true);
+        font.setWeight(75);
+        lcdNumber->setFont(font);
+        lcdNumber->setAutoFillBackground(false);
+        equation_display = new QLabel(centralWidget);
+        equation_display->setObjectName(QStringLiteral("equation_display"));
+        equation_display->setGeometry(QRect(136, 60, 101, 20));
+        equation_display->setAlignment(Qt::AlignCenter);
         CalculatorMain->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(CalculatorMain);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -153,8 +164,8 @@ public:
         button_mul->setText(QApplication::translate("CalculatorMain", "X", 0));
         button_mod->setText(QApplication::translate("CalculatorMain", "%", 0));
         button_clear->setText(QApplication::translate("CalculatorMain", "Clear", 0));
-        num_screen->setText(QString());
         button_enter->setText(QApplication::translate("CalculatorMain", "Enter", 0));
+        equation_display->setText(QString());
         menuCalculator->setTitle(QApplication::translate("CalculatorMain", "Calculator", 0));
     } // retranslateUi
 

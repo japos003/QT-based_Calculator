@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <stack>
+#include <queue>
 
 namespace Ui {
 class CalculatorMain;
@@ -32,11 +33,14 @@ public:
 private:
     Ui::CalculatorMain *ui;
     std::string equation;
+    std::string display_result;
     std::stack<number_data> number_storage;
 
-    _num create_number(std::string equation, math_op func);
+    std::string parse(std::string equation, char operation1, char operation2);
+    std::string parse_mul_div(std::string equation);
+    std::string parse_add_sub(std::string equation);
 
-    void calculate(std::string num);
+    int calculate(std::queue<int>, std::queue<char>);
 
 public slots:
     void button_pressed(QString button_command);
