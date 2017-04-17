@@ -24,3 +24,7 @@ inputed numbers
 ### 2017 April 14
 
 * Updated and changed parsing algorithm. The algorithm now consider PEMDAS.
+
+### 2017 April 17
+
+* Changed the precedence of modulo to the same as multiply and divide.
