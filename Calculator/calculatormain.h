@@ -36,11 +36,12 @@ private:
     std::string display_result;
     std::stack<number_data> number_storage;
 
-    std::string parse(std::string equation, char operation1, char operation2);
+    std::string parse(std::string equation, char operation1, char operation2, char operation3);
     std::string parse_mul_div(std::string equation);
     std::string parse_add_sub(std::string equation);
 
     int calculate(std::queue<int>, std::queue<char>);
+    bool contains_operators(std::string equation);
 
 public slots:
     void button_pressed(QString button_command);

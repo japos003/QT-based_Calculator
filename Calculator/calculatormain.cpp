@@ -167,7 +167,7 @@ void CalculatorMain::button_pressed(QString button_command){
             break;
         case 14:
             std::cout << "button modulo pressed" << std::endl;
-            //number_storage.push(create_number(equation, MOD));
+            equation += "%";
             break;
         case 15:
             std::cout << "button clear pressed" << std::endl;
@@ -178,6 +178,7 @@ void CalculatorMain::button_pressed(QString button_command){
             display_result = parse_mul_div(equation);
             display_result = parse_add_sub(display_result);
             ui->lcdNumber->display(atoi(display_result.c_str()));
+            equation = "";
             break;
     }
 
@@ -186,7 +187,7 @@ void CalculatorMain::button_pressed(QString button_command){
     //ui->num_screen->setText(QString::fromStdString(equation));
 }
 
-std::string CalculatorMain::parse(std::string equation, char operator1, char operator2) {
+std::string CalculatorMain::parse(std::string equation, char operator1, char operator2, char operator3) {
     std::queue<int> int_queue;
     std::queue<char> operation_queue;
 
@@ -196,11 +197,11 @@ std::string CalculatorMain::parse(std::string equation, char operator1, char ope
 
     for (int ch = 0; ch < equation.size(); ch++) {
         std::cout << equation[ch] << std::endl;
-        if (equation[ch] == '*' || equation[ch] == '/' || equation[ch] == '+' || equation[ch] == '-') {
+        if (equation[ch] == '*' || equation[ch] == '/' || equation[ch] == '+' || equation[ch] == '-' || equation[ch] == '%') {
 
             int_queue.push(atoi(num.c_str()));
 
-            if (equation[ch] == operator1 || equation[ch] == operator2) {
+            if (equation[ch] == operator1 || equation[ch] == operator2 || equation[ch] == operator3) {
                 operation_queue.push(equation[ch]);
             }
 
@@ -248,6 +249,8 @@ int CalculatorMain::calculate(std::queue<int> int_queue, std::queue<char> operat
         if (operation_queue.front() == '*') {
             res *= int_queue.front();
         }
+        else if (operation_queue.front() == '%')
+            res %= int_queue.front();
         else if (operation_queue.front() == '/')
             res /= int_queue.front();
         else if (operation_queue.front() == '+')
@@ -268,10 +271,17 @@ int CalculatorMain::calculate(std::queue<int> int_queue, std::queue<char> operat
 }
 
 std::string CalculatorMain::parse_mul_div(std::string equation) {
-    return parse(equation, '*', '/');
+    return parse(equation, '*', '/', '%');
 }
 
 std::string CalculatorMain::parse_add_sub(std::string equation) {
 
-    return parse(equation, '+', '-');
+    return parse(equation, '+', '-', NULL);
+}
+
+bool CalculatorMain::contains_operators(std::string equation){
+    for(int ch = 0; ch < equation.size(); ++ch)
+        if(equation[ch] == '*' || equation[ch] == '+' || equation[ch] == '-' || equation[ch] == '/')
+            return true;
+    return false;
 }
